@@ -1,0 +1,280 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Yatra+One&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 39 100% 97%;
+    --foreground: 30 30% 15%;
+
+    --card: 39 100% 97%;
+    --card-foreground: 30 30% 15%;
+
+    --popover: 39 100% 97%;
+    --popover-foreground: 30 30% 15%;
+
+    --primary: 30 80% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 80% 90%;
+    --secondary-foreground: 30 30% 15%;
+
+    --muted: 40 70% 95%;
+    --muted-foreground: 30 30% 40%;
+
+    --accent: 20 90% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 40% 90%;
+    --input: 30 40% 90%;
+    --ring: 30 80% 50%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 39 100% 97%;
+    --sidebar-foreground: 30 30% 15%;
+    --sidebar-primary: 30 80% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 20 90% 60%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 30 40% 90%;
+    --sidebar-ring: 30 80% 50%;
+  }
+
+  .dark {
+    --background: 30 30% 10%;
+    --foreground: 40 70% 90%;
+
+    --card: 30 30% 10%;
+    --card-foreground: 40 70% 90%;
+
+    --popover: 30 30% 10%;
+    --popover-foreground: 40 70% 90%;
+
+    --primary: 30 80% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 30% 20%;
+    --secondary-foreground: 40 70% 90%;
+
+    --muted: 40 30% 20%;
+    --muted-foreground: 40 40% 60%;
+
+    --accent: 20 90% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 40 30% 20%;
+    --input: 40 30% 20%;
+    --ring: 30 80% 50%;
+    
+    --sidebar-background: 30 30% 10%;
+    --sidebar-foreground: 40 70% 90%;
+    --sidebar-primary: 30 80% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 20 90% 60%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 40 30% 20%;
+    --sidebar-ring: 30 80% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-ayodhya-light text-foreground font-['Poppins'];
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-['Yatra_One'];
+  }
+}
+
+.hero-section {
+  background-image: linear-gradient(rgba(255, 246, 224, 0.7), rgba(255, 246, 224, 0.7)), url('/images/ram-mandir-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.page-transition {
+  @apply animate-fade-in;
+}
+
+/* Flower Petals Animation */
+.flower-petals-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.petal {
+  position: absolute;
+  top: -50px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.rose-petal {
+  background-image: url('/lovable-uploads/rose-petal.png');
+  filter: hue-rotate(330deg);
+}
+
+.marigold-petal {
+  background-image: url('/lovable-uploads/marigold-petal.png');
+  filter: hue-rotate(30deg);
+}
+
+@keyframes falling-petal {
+  0% {
+    transform: translateY(-50px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sway {
+  0% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(100px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+/* Card Animation - Enhanced */
+.card-custom {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(40px);
+  opacity: 0;
+}
+
+.card-custom.animated {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Section animation - Enhanced */
+.section-animate {
+  transition: all 0.8s ease-out;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.section-animate.animated {
+  opacity: 1;
+  transform: translateY(0);
+  box-shadow: 0 0 20px rgba(255, 153, 51, 0.1); /* Saffron glow */
+}
+
+/* Scale Animation */
+@keyframes scale-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-scale-up {
+  animation: scale-pulse 0.5s ease;
+}
+
+.btn-primary, .btn-secondary {
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover, .btn-secondary:hover {
+  animation: scale-pulse 0.5s ease;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.container-custom {
+  @apply container mx-auto px-4 sm:px-6 lg:px-8 py-8;
+}
+
+.section-title {
+  @apply text-3xl sm:text-4xl md:text-5xl text-ayodhya-maroon font-bold mb-6 text-center;
+}
+
+.card-custom {
+  @apply bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+
+.btn-primary {
+  @apply bg-ayodhya-saffron text-white py-2 px-4 rounded-md hover:bg-ayodhya-orange transition-colors duration-300;
+}
+
+.btn-secondary {
+  @apply bg-ayodhya-cream text-ayodhya-maroon border border-ayodhya-maroon py-2 px-4 rounded-md hover:bg-ayodhya-yellow transition-colors duration-300;
+}
+
+.image-container {
+  @apply relative overflow-hidden;
+}
+
+.image-container img {
+  @apply w-full h-full object-cover transition-transform duration-500 hover:scale-110;
+}
+
+/* Hindu Symbols Background Pattern */
+.hindu-symbols-pattern {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fb9d40; /* Saffron color */
+  background-image: 
+    radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    url('/lovable-uploads/om-pattern.png');
+  background-size: 50px 50px, 100px 100px;
+  background-position: 0 0;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Add a subtle saffron gradient to cards */
+.card {
+  background: linear-gradient(135deg, rgba(255, 153, 51, 0.05), transparent);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(255, 153, 51, 0.1);
+}
