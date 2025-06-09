@@ -141,7 +141,7 @@ const RamMandirPage = () => {
         <section className="max-w-4xl mx-auto mb-10 section-animate">
           <h2 className="text-2xl font-bold text-ayodhya-maroon mb-4 text-center">Plan Your Visit</h2>
           
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-1 gap-1">
             <Link to="/dharmshala" className="bg-white p-5 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
               <h3 className="text-xl font-bold text-ayodhya-maroon mb-2">Accommodations</h3>
               <p className="mb-3">Find the perfect place to stay during your spiritual journey, from traditional dharmshala to modern hotels.</p>

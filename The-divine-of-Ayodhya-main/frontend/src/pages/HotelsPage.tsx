@@ -69,7 +69,7 @@ const HotelsPage = () => {
                 {/* Hotel 3 */}
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
                   <img 
-                    src="https://content.jdmagicbox.com/comp/ayodhya/g6/9999px5278.x5278.220328124633.a6g6/catalogue/hotel-shane-awadh-ayodhya-hotels-rs-1001-to-rs-2000--c2x9w5t5p6.jpg" 
+                    src="https://r1imghtlak.mmtcdn.com/787071601eaa11eeaa450a58a9feac02.jpg" 
                     alt="Shane Awadh" 
                     className="w-full h-48 object-cover" 
                   />

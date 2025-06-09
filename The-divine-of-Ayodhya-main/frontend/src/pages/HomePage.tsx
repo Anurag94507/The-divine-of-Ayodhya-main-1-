@@ -7,6 +7,7 @@ import FlowerPetals from '../components/FlowerPetals';
 import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Utensils, BedDouble, Camera, Map, Landmark } from 'lucide-react'; // Using Landmark icon
+import DonationSection from '../components/DonationSection';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import AnimatedCardWrapper from '../components/AnimatedCardWrapper'; // Import the wrapper
 
@@ -212,8 +213,8 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* Donation Section - Added Here */}
-        {/* <DonationSection /> */}
+        {/* Donation Section */}
+        <DonationSection />
 
         {/* About Ayodhya Snippet - Updated */}
         <section className="py-16 bg-white section-animate">
