@@ -13,9 +13,9 @@ declare global {
   }
 }
 
-const NGO_NAME = "[feed orphan]"; // <-- REPLACE THIS
-const RAZORPAY_KEY_ID = "rzp_test_sS4pKgwR9F3SU7"; // Your actual TEST key ID
-const BACKEND_URL = "http://localhost:3001"; // Mock backend URL
+const NGO_NAME = "Ayodhya Blessings Temple Trust";
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_RgUpx3CB4OtecR";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5001";
 
 const DonationSection: React.FC<{}> = () => { // Added curly braces here
   const [amount, setAmount] = useState<string>('');
@@ -33,8 +33,8 @@ const DonationSection: React.FC<{}> = () => { // Added curly braces here
     }
 
     try {
-      // 1. Call your MOCK backend to create an order
-      console.log(`[Frontend] Calling MOCK backend at ${BACKEND_URL}/api/create-order`);
+      // 1. Call backend to create an order
+      console.log(`[Frontend] Creating order with amount: ${donationAmount} paise`);
       const orderResponse = await fetch(`${BACKEND_URL}/api/create-order`, {
         method: 'POST',
         headers: {
@@ -44,33 +44,40 @@ const DonationSection: React.FC<{}> = () => { // Added curly braces here
       });
 
       if (!orderResponse.ok) {
-        const errorData = await orderResponse.text(); // Get potential error text
-        console.error("[Frontend] Error creating mock order:", errorData);
-        throw new Error('Failed to create mock donation order.');
+        const errorData = await orderResponse.text();
+        console.error("[Frontend] Error creating order:", errorData);
+        toast({ 
+          title: "Error", 
+          description: "Failed to create donation order. Please try again.", 
+          variant: "destructive" 
+        });
+        setLoading(false);
+        return;
       }
 
       const orderData = await orderResponse.json();
-      console.log("[Frontend] Received mock order data:", orderData);
+      console.log("[Frontend] Received order data:", orderData);
 
       // Ensure orderData contains the expected fields
       if (!orderData.order_id || !orderData.amount) {
-        throw new Error('Mock backend did not return expected order data.');
+        console.error("[Frontend] Invalid order data:", orderData);
+        throw new Error('Backend did not return expected order data.');
       }
 
-      // 2. Configure Razorpay Checkout
+      // 2. Configure Razorpay Checkout for REAL PAYMENTS
       const options = {
-        key: RAZORPAY_KEY_ID, // Use the provided Test Key ID
+        key: RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency || 'INR',
-        name: "Ayodhya Blossom Experience",
+        name: "Ayodhya Blessings",
         description: `Donation to ${NGO_NAME}`,
         image: "/assets/images/ayodhya-logo.png",
-        order_id: orderData.order_id, // Use the MOCK Order ID from backend
+        order_id: orderData.order_id,
         handler: async (response: any) => {
-          // 3. Payment Success: Verify payment on MOCK backend
+          // 3. Payment Success: Verify payment on backend
           try {
-            console.log(`[Frontend] Calling MOCK backend at ${BACKEND_URL}/api/verify-payment`);
-            const verificationResponse = await fetch(`${BACKEND_URL}/api/verify-payment`, { // Corrected typo: 'verify-payment'
+            console.log(`[Frontend] Payment completed! Response:`, response);
+            const verificationResponse = await fetch(`${BACKEND_URL}/api/verify-payment`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -84,23 +91,31 @@ const DonationSection: React.FC<{}> = () => { // Added curly braces here
 
             if (!verificationResponse.ok) {
               const errorData = await verificationResponse.text();
-              console.error("[Frontend] Error verifying mock payment:", errorData);
-              throw new Error('Mock payment verification failed.');
+              console.error("[Frontend] Error verifying payment:", errorData);
+              throw new Error('Payment verification failed.');
             }
 
             const verificationData = await verificationResponse.json();
-            console.log("[Frontend] Received mock verification data:", verificationData);
+            console.log("[Frontend] Verification response:", verificationData);
 
             if (verificationData.status === 'success') {
-              toast({ title: "Success (Mock)", description: "Mock donation successful! Thank you!" });
+              toast({ 
+                title: "Success! 🎉", 
+                description: "Your donation has been received successfully. Thank you for your support!", 
+                variant: "default" 
+              });
               setAmount(''); // Clear amount field
             } else {
-              throw new Error('Mock payment verification failed.');
+              throw new Error('Payment verification failed.');
             }
 
           } catch (verifyError: any) {
-            console.error("[Frontend] Mock verification error:", verifyError);
-            toast({ title: "Verification Failed (Mock)", description: verifyError.message || 'Could not verify mock payment.', variant: "destructive" });
+            console.error("[Frontend] Verification error:", verifyError);
+            toast({ 
+              title: "Verification Failed", 
+              description: verifyError.message || 'Could not verify payment.', 
+              variant: "destructive" 
+            });
           }
         },
         prefill: {},
@@ -114,16 +129,27 @@ const DonationSection: React.FC<{}> = () => { // Added curly braces here
 
       // 4. Open Razorpay Checkout Modal
       console.log("[Frontend] Opening Razorpay Checkout Modal...");
+      console.log("[Frontend] Razorpay object:", window.Razorpay);
+      
+      if (!window.Razorpay) {
+        throw new Error('Razorpay script not loaded. Please refresh the page.');
+      }
+      
       const rzp = new window.Razorpay(options);
       rzp.on('payment.failed', (response: any) => {
         console.error("[Frontend] Payment Failed Callback:", response.error);
-        toast({ title: "Payment Failed (Mock)", description: response.error.description || 'An error occurred during mock payment.', variant: "destructive" });
+        toast({ 
+          title: "Payment Failed", 
+          description: response.error?.description || 'An error occurred during payment. This is a test payment, so no real transaction was made.', 
+          variant: "destructive" 
+        });
+        setLoading(false);
       });
       rzp.open();
 
     } catch (error: any) {
       console.error("[Frontend] Donation error:", error);
-      toast({ title: "Error (Mock Setup)", description: error.message || 'Could not initiate mock donation.', variant: "destructive" });
+      toast({ title: "Error", description: error.message || 'Could not initiate donation.', variant: "destructive" });
     }
 
     setLoading(false);
@@ -171,7 +197,7 @@ const DonationSection: React.FC<{}> = () => { // Added curly braces here
           </CardFooter>
         </Card>
         <p className="text-center text-sm text-gray-600 mt-4">
-          Using MOCK backend for testing. No real payments will be processed.
+          Secure payment powered by Razorpay. Your donation supports Ayodhya's community.
         </p>
       </div>
     </section>

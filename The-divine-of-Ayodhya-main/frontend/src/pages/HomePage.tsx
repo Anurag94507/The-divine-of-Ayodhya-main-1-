@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import PageLayout from '../components/PageLayout';
 import FlowerPetals from '../components/FlowerPetals';
-// import DonationSection from '../components/DonationSection'; // Import DonationSection
 import { useAnimateOnScroll } from '../hooks/useAnimateOnScroll';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Utensils, BedDouble, Camera, Map, Landmark } from 'lucide-react'; // Using Landmark icon

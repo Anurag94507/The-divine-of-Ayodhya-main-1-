@@ -4,7 +4,7 @@ import FlowerPetals from '../components/FlowerPetals';
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/components/ui/use-toast';
 
-const BACKEND_URL = "http://localhost:5000"; // Backend URL
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5001"; // Backend URL
 
 const ContactPage = () => {
   useEffect(() => {
