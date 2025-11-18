@@ -1,5 +1,5 @@
 [build]
-  base = "frontend"
+  base = "The-divine-of-Ayodhya-main/frontend"
   command = "npm run build"
   publish = "dist"
 
@@ -9,7 +9,7 @@
   status = 200
 
 [context.production]
-  environment = { VITE_BACKEND_URL = "https://your-backend-url.herokuapp.com", VITE_RAZORPAY_KEY_ID = "rzp_live_RgUpx3CB4OtecR" }
+  environment = { VITE_BACKEND_URL = "https://your-backend-url.onrender.com", VITE_RAZORPAY_KEY_ID = "rzp_live_RgUpx3CB4OtecR" }
 
 [context.deploy-preview]
   environment = { VITE_BACKEND_URL = "http://localhost:5001", VITE_RAZORPAY_KEY_ID = "rzp_live_RgUpx3CB4OtecR" }
