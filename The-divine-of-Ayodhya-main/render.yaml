@@ -2,7 +2,7 @@ services:
   - type: web
     name: divine-ayodhya-api
     runtime: node
-    rootDir: The-divine-of-Ayodhya-main/server
+    rootDir: server
     buildCommand: npm install
     startCommand: npm start
     envVars:
@@ -20,7 +20,7 @@ services:
   - type: web
     name: divine-ayodhya-frontend
     runtime: node
-    rootDir: The-divine-of-Ayodhya-main/frontend
+    rootDir: frontend
     buildCommand: npm run build
     startCommand: npx serve -s dist -l 3000
     envVars:
