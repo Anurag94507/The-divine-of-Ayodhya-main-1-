@@ -131,8 +131,8 @@ const ContactPage = () => {
     {
       icon: <Mail className="w-5 h-5" />,
       title: 'Email Us',
-      details: ['ayodhyablossom@gmail.com'],
-      link: 'mailto:ayodhyablossom@gmail.com',
+      details: ['divineofayodhya@gmail.com'],
+      link: 'mailto:divineofayodhya@gmail.com',
     },
   ];
 
