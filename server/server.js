@@ -55,23 +55,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// ========================
-// 📧 EMAIL CONFIGURATION
-// ========================
 const hasEmailConfig = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.EMAIL_PASS !== 'YOUR_APP_PASSWORD_HERE');
+const hasResendConfig = Boolean(process.env.RESEND_API_KEY && process.env.RESEND_API_KEY.startsWith('re_'));
 
 let transporter = null;
 if (hasEmailConfig) {
   transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS.replace(/\s+/g, ''), // Remove any accidental spaces in App Password
-    },
-    tls: {
-      rejectUnauthorized: false,
+      pass: process.env.EMAIL_PASS.replace(/\s+/g, ''),
     },
     connectionTimeout: 8000,
     greetingTimeout: 8000,
@@ -133,54 +126,87 @@ app.post('/api/send-message', async (req, res) => {
   console.log(`   Message: "${message.substring(0, 80)}${message.length > 80 ? '...' : ''}"`);
   console.log(`   Saved in: server/data/contact-messages.json (ID: ${savedEntry.id})\n`);
 
-  // 2. If SMTP is configured, attempt delivery
+  // 2. HTML email template
+  const emailHtml = `
+    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #fed7aa;">
+      <div style="background: linear-gradient(135deg, #FF9933, #800000); padding: 24px; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 22px;">🙏 New Contact Inquiry</h1>
+        <p style="color: #fed7aa; margin: 8px 0 0; font-size: 14px;">The Divine of Ayodhya</p>
+      </div>
+      <div style="padding: 24px;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #800000; width: 100px;">Name</td>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; color: #1f2937;">${name}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #800000;">Email</td>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; color: #1f2937;">${email || 'Not provided'}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #800000;">Phone</td>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; color: #1f2937;">${phone || 'Not provided'}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #800000;">Subject</td>
+            <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; color: #1f2937;">${subject || 'General'}</td>
+          </tr>
+        </table>
+        <div style="margin-top: 20px; padding: 16px; background: #FFF6E0; border-radius: 8px; border-left: 4px solid #FF9933;">
+          <h4 style="margin: 0 0 8px; color: #800000;">Message:</h4>
+          <p style="margin: 0; line-height: 1.6; color: #374151;">${message.replace(/\n/g, '<br>')}</p>
+        </div>
+      </div>
+      <div style="padding: 14px; background: #faf5eb; text-align: center; color: #78350f; font-size: 12px;">
+        Submitted from The Divine of Ayodhya • Received at ${new Date().toLocaleString('en-IN')}
+      </div>
+    </div>
+  `;
+
   let emailDispatched = false;
-  if (transporter && hasEmailConfig) {
+
+  // 3. Attempt delivery via Resend HTTPS API if configured
+  if (hasResendConfig) {
+    try {
+      const resendRes = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'The Divine of Ayodhya <onboarding@resend.dev>',
+          to: [process.env.EMAIL_USER || 'divineofayodhya@gmail.com'],
+          reply_to: email || undefined,
+          subject: subject ? `[The Divine of Ayodhya] ${subject}` : '[The Divine of Ayodhya] New Contact Message',
+          html: emailHtml,
+        }),
+      });
+      const resendJson = await resendRes.json();
+      if (resendRes.ok) {
+        emailDispatched = true;
+        console.log('✅ Email delivered via Resend HTTPS API:', resendJson.id);
+      } else {
+        console.log('⚠️ Resend Note:', resendJson.message || resendJson);
+      }
+    } catch (rErr) {
+      console.log('ℹ️ Resend dispatch error:', rErr.message);
+    }
+  }
+
+  // 4. Attempt delivery via Nodemailer SMTP if not yet dispatched
+  if (!emailDispatched && transporter && hasEmailConfig) {
     const mailOptions = {
-      from: `"Ayodhya Blessings Contact Form" <${process.env.EMAIL_USER}>`,
+      from: `"The Divine of Ayodhya" <${process.env.EMAIL_USER}>`,
       replyTo: email || undefined,
       to: process.env.EMAIL_USER,
-      subject: subject ? `[Ayodhya Blessings] ${subject}` : '[Ayodhya Blessings] New Contact Submission',
-      html: `
-        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #fed7aa;">
-          <div style="background: linear-gradient(135deg, #FF9933, #800000); padding: 24px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 22px;">🙏 New Contact Inquiry</h1>
-            <p style="color: #fed7aa; margin: 8px 0 0; font-size: 14px;">The Divine of Ayodhya</p>
-          </div>
-          <div style="padding: 24px;">
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #800000; width: 100px;">Name</td>
-                <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; color: #1f2937;">${name}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #800000;">Email</td>
-                <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; color: #1f2937;">${email || 'Not provided'}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #800000;">Phone</td>
-                <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; color: #1f2937;">${phone || 'Not provided'}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #800000;">Subject</td>
-                <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; color: #1f2937;">${subject || 'General'}</td>
-              </tr>
-            </table>
-            <div style="margin-top: 20px; padding: 16px; background: #FFF6E0; border-radius: 8px; border-left: 4px solid #FF9933;">
-              <h4 style="margin: 0 0 8px; color: #800000;">Message:</h4>
-              <p style="margin: 0; line-height: 1.6; color: #374151;">${message.replace(/\n/g, '<br>')}</p>
-            </div>
-          </div>
-          <div style="padding: 14px; background: #faf5eb; text-align: center; color: #78350f; font-size: 12px;">
-            Submitted from Ayodhya Blessings Website • Received at ${new Date().toLocaleString('en-IN')}
-          </div>
-        </div>
-      `,
+      subject: subject ? `[The Divine of Ayodhya] ${subject}` : '[The Divine of Ayodhya] New Contact Submission',
+      html: emailHtml,
     };
 
     try {
       await transporter.sendMail(mailOptions);
-      console.log('✅ Email sent to Gmail inbox successfully.');
+      console.log('✅ Email sent to Gmail inbox via SMTP successfully.');
       emailDispatched = true;
     } catch (smtpErr) {
       console.log('ℹ️  Note on Gmail SMTP:', smtpErr.message);
