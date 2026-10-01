@@ -63,14 +63,19 @@ const hasEmailConfig = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS 
 let transporter = null;
 if (hasEmailConfig) {
   transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      pass: process.env.EMAIL_PASS.replace(/\s+/g, ''), // Remove any accidental spaces in App Password
     },
-    connectionTimeout: 4000,
-    greetingTimeout: 4000,
-    socketTimeout: 5000,
+    tls: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 10000,
   });
 }
 
@@ -197,6 +202,45 @@ app.get('/api/contact-messages', (req, res) => {
     res.json({ success: true, count: JSON.parse(raw || '[]').length, messages: JSON.parse(raw || '[]') });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// Diagnostic endpoint to test email delivery
+app.get('/api/test-email', async (req, res) => {
+  if (!transporter || !hasEmailConfig) {
+    return res.status(400).json({
+      success: false,
+      error: 'Email configuration is missing in server/.env',
+      EMAIL_USER: process.env.EMAIL_USER || 'Not configured',
+    });
+  }
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"The Divine of Ayodhya" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
+      subject: '🧪 Test Email from The Divine of Ayodhya',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; background: #FFF6E0; border: 1px solid #FF9933; border-radius: 8px;">
+          <h2 style="color: #800000; margin-top: 0;">🙏 SMTP Test Succeeded!</h2>
+          <p>Your Gmail credentials are properly configured and emails can be dispatched successfully.</p>
+          <p style="font-size: 12px; color: #666;">Sent at: ${new Date().toLocaleString('en-IN')}</p>
+        </div>
+      `,
+    });
+
+    res.json({
+      success: true,
+      message: '✅ Test email sent successfully to ' + process.env.EMAIL_USER,
+      messageId: info.messageId,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      code: error.code,
+      details: 'If running locally on home WiFi, ISPs often block SMTP ports (ETIMEDOUT). Deployed cloud servers (Vercel/Render) allow outbound SMTP.',
+    });
   }
 });
 
