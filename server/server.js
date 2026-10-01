@@ -232,6 +232,7 @@ app.post('/api/send-message', async (req, res) => {
       replyTo: email || undefined,
       to: process.env.EMAIL_USER,
       subject: subject ? `[The Divine of Ayodhya] ${subject}` : '[The Divine of Ayodhya] New Contact Submission',
+      text: `You have a new message:\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nSubject: ${subject}\n\nMessage:\n${message}`,
       html: emailHtml,
     };
 
