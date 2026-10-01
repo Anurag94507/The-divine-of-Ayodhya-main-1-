@@ -361,10 +361,156 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     hasEmailConfig,
+    hasResendConfig,
     razorpayKeyId: process.env.RAZORPAY_KEY_ID || 'Not set',
     isLiveKey,
   });
 });
+
+// Serve frontend build if available, otherwise show beautiful API status dashboard
+const frontendDist = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next();
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>🚩 The Divine of Ayodhya - API Server</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+              font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+              background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 20px;
+              color: #431407;
+            }
+            .card {
+              background: white;
+              border-radius: 24px;
+              box-shadow: 0 20px 40px rgba(128, 0, 0, 0.08);
+              border: 1px solid #fed7aa;
+              max-width: 580px;
+              width: 100%;
+              overflow: hidden;
+              text-align: center;
+            }
+            .header {
+              background: linear-gradient(135deg, #ea580c, #991b1b);
+              color: white;
+              padding: 32px 24px;
+            }
+            .header h1 { font-size: 26px; margin-bottom: 6px; }
+            .header p { color: #ffedd5; font-size: 15px; }
+            .content { padding: 32px 28px; }
+            .status-badge {
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              background: #ecfdf5;
+              color: #065f46;
+              padding: 8px 16px;
+              border-radius: 9999px;
+              font-weight: 600;
+              font-size: 14px;
+              border: 1px solid #a7f3d0;
+              margin-bottom: 24px;
+            }
+            .pulse-dot {
+              width: 10px;
+              height: 10px;
+              background: #10b981;
+              border-radius: 50%;
+              display: inline-block;
+            }
+            .grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 12px;
+              margin-bottom: 24px;
+              text-align: left;
+            }
+            .item {
+              background: #fafaf9;
+              padding: 12px 16px;
+              border-radius: 12px;
+              border: 1px solid #f5f5f4;
+            }
+            .item-title { font-size: 11px; text-transform: uppercase; color: #78716c; font-weight: 700; margin-bottom: 4px; }
+            .item-val { font-size: 14px; font-weight: 600; color: #1c1917; }
+            .endpoints {
+              background: #fffbeb;
+              border: 1px solid #fde68a;
+              border-radius: 16px;
+              padding: 20px;
+              text-align: left;
+            }
+            .endpoints h3 { font-size: 14px; color: #92400e; margin-bottom: 12px; }
+            .endpoint-link {
+              display: flex;
+              justify-content: space-between;
+              padding: 8px 0;
+              border-bottom: 1px solid #fef3c7;
+              font-family: monospace;
+              font-size: 13px;
+              color: #b45309;
+              text-decoration: none;
+            }
+            .endpoint-link:last-child { border-bottom: none; }
+            .endpoint-link:hover { color: #ea580c; }
+            .footer { padding: 16px; font-size: 13px; color: #a8a29e; border-top: 1px solid #f5f5f4; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <div class="header">
+              <h1>🕉️ The Divine of Ayodhya</h1>
+              <p>Cloud Backend Server is Live & Healthy</p>
+            </div>
+            <div class="content">
+              <div class="status-badge">
+                <span class="pulse-dot"></span> API Server Operational
+              </div>
+
+              <div class="grid">
+                <div class="item">
+                  <div class="item-title">Active Mailbox</div>
+                  <div class="item-val">${process.env.EMAIL_USER || 'divineofayodhya@gmail.com'}</div>
+                </div>
+                <div class="item">
+                  <div class="item-title">Razorpay Gateway</div>
+                  <div class="item-val">🟢 Live Active</div>
+                </div>
+              </div>
+
+              <div class="endpoints">
+                <h3>📡 Quick API Endpoints</h3>
+                <a href="/api/health" class="endpoint-link"><span>GET /api/health</span> <span>Check Health ↗</span></a>
+                <a href="/api/contact-messages" class="endpoint-link"><span>GET /api/contact-messages</span> <span>View Inquiries ↗</span></a>
+                <a href="/api/razorpay-key" class="endpoint-link"><span>GET /api/razorpay-key</span> <span>Payment Key ↗</span></a>
+                <a href="/api/donations" class="endpoint-link"><span>GET /api/donations</span> <span>Donations ↗</span></a>
+              </div>
+            </div>
+            <div class="footer">
+              🙏 Jai Shri Ram • The Divine of Ayodhya Platform
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
+  });
+}
 
 // Start server
 app.listen(port, () => {
