@@ -1,5 +1,27 @@
 {
-  "dependencies": {
-    "react-icons": "^5.5.0"
-  }
+  "name": "the-divine-of-ayodhya-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Divine of Ayodhya - Complete Monorepo for Frontend and Server",
+  "scripts": {
+    "dev": "npm run dev:frontend",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build": "cd frontend && npm run build",
+    "preview": "cd frontend && npm run preview",
+    "server": "cd server && npm start",
+    "install:all": "npm install --prefix frontend && npm install --prefix server"
+  },
+  "keywords": [
+    "ayodhya",
+    "ram-mandir",
+    "react",
+    "typescript",
+    "vite",
+    "tailwind",
+    "express",
+    "razorpay"
+  ],
+  "author": "Kartikey",
+  "license": "MIT"
 }
