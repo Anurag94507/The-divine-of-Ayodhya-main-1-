@@ -165,8 +165,39 @@ app.post('/api/send-message', async (req, res) => {
 
   let emailDispatched = false;
 
-  // 3. Attempt delivery via Resend HTTPS API if configured
-  if (hasResendConfig) {
+  // 3. Guaranteed HTTPS Delivery via FormSubmit Webhook to divineofayodhya@gmail.com
+  try {
+    const targetEmail = process.env.EMAIL_USER || 'divineofayodhya@gmail.com';
+    const fsRes = await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': 'https://the-divine-of-ayodhya.onrender.com',
+        'Referer': 'https://the-divine-of-ayodhya.onrender.com/',
+      },
+      body: JSON.stringify({
+        _subject: subject ? `🚩 [The Divine of Ayodhya] ${subject}` : '🚩 [The Divine of Ayodhya] New Contact Inquiry',
+        name: name,
+        email: email || 'Not provided',
+        phone: phone || 'Not provided',
+        message: message,
+        _replyto: email || undefined,
+      }),
+    });
+    const fsData = await fsRes.json();
+    if (fsData.success === 'true' || fsData.success === true) {
+      emailDispatched = true;
+      console.log('✅ Email delivered to inbox via FormSubmit HTTPS Webhook.');
+    } else {
+      console.log('ℹ️ FormSubmit Note:', fsData.message);
+    }
+  } catch (fsErr) {
+    console.log('ℹ️ FormSubmit error:', fsErr.message);
+  }
+
+  // 4. Attempt delivery via Resend HTTPS API if configured
+  if (!emailDispatched && hasResendConfig) {
     try {
       const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -194,7 +225,7 @@ app.post('/api/send-message', async (req, res) => {
     }
   }
 
-  // 4. Attempt delivery via Nodemailer SMTP if not yet dispatched
+  // 5. Attempt delivery via Nodemailer SMTP if not yet dispatched
   if (!emailDispatched && transporter && hasEmailConfig) {
     const mailOptions = {
       from: `"The Divine of Ayodhya" <${process.env.EMAIL_USER}>`,
