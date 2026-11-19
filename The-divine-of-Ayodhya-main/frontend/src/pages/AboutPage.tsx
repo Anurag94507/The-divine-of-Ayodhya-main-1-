@@ -148,11 +148,11 @@ const AboutPage = () => {
                   <h2 className="text-3xl font-bold text-ayodhya-maroon mb-6 text-center">Website Developer</h2>
                   <AnimatedCardWrapper>
                     <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-                      <h3 className="text-2xl font-bold text-ayodhya-maroon mb-3">Kartikey Vishwakarma</h3>
+                      <h3 className="text-2xl font-bold text-ayodhya-maroon mb-3">Anurag Mishra</h3>
                       <p className="text-lg mb-4">Full-stack Developer & Designer</p>
                       <div className="mb-4">
-                        <p className="text-gray-700 mb-1"><strong>Phone:</strong> 6394650470</p>
-                        <p className="text-gray-700"><strong>Email:</strong> kartikeyvishwakarma@gmail.com</p>
+                        <p className="text-gray-700 mb-1"><strong>Phone:</strong> +917800509636</p>
+                        <p className="text-gray-700"><strong>Email:</strong> mranurag0007@gmail.com</p>
                       </div>
                       <p className="text-gray-600 italic">
                         "Dedicated to creating digital experiences that blend technology with spiritual values, helping pilgrims connect with the divine heritage of Ayodhya."
@@ -296,9 +296,9 @@ const AboutPage = () => {
                   {/* Developer Info */}
                   <div className="bg-white p-6 rounded-lg shadow-md">
                     <div className="text-center text-gray-600">
-                      <p className="mb-2">Developed by Kartikey Vishwakarma</p>
-                      <p className="mb-2">Contact: 6394650470</p>
-                      <p>Email: kartikeyvishwakarma@gmail.com</p>
+                      <p className="mb-2">Developed by Anurag Mishra</p>
+                      <p className="mb-2">Contact: +917800509636</p>
+                      <p>Email: mranurag0007@gmail.com</p>
                     </div>
                   </div>
                 </div>

@@ -76,7 +76,7 @@ const Footer = () => {
         </div>
         
         <div className="mt-6 pt-4 border-t border-gray-700 text-center text-sm">
-          <p>Developed by Kartikey Vishwakarma | Contact: 6394650470 | Email: kartikeyvishwakarma@gmail.com</p>
+          <p>Developed by Anurag Mishra | Contact: +917800509636 | Email: mranurag0007@gmail.com</p>
           <p className="mt-1">&copy; {new Date().getFullYear()} Ayodhya Blessings. All rights reserved.</p>
         </div>
       </div>

@@ -174,7 +174,7 @@ const Footer = () => {
         <div className="border-t border-white/10">
           <div className="container mx-auto px-4 py-5">
             <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-white/40">
-              <p>Developed with <Heart size={12} className="inline text-red-400 mx-1" /> by Kartikey Vishwakarma</p>
+              <p>Developed with <Heart size={12} className="inline text-red-400 mx-1" /> by Anurag Mishra</p>
               <p>© {currentYear} Ayodhya Blessings. All rights reserved.</p>
             </div>
           </div>
